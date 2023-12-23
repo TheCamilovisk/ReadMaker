@@ -49,7 +49,7 @@ def get_files_list(root_dir: str, include_hidden: bool = False) -> List[str]:
 
 def get_file_contents(file_path: str) -> Dict[str, str]:
     if not (os.path.isfile(file_path) and is_text_file(file_path)):
-        raise FileNotFoundError(f"Not a valid text file: {file_path}")
+        raise ValueError(f"Not a valid text file: {file_path}")
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
     return content
