@@ -53,3 +53,7 @@ def get_file_contents(file_path: str) -> Dict[str, str]:
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
     return content
+
+
+def get_relative_path(file_path: str, root_dir: str) -> str:
+    return file_path.replace(root_dir, "")[1:]
