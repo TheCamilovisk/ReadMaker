@@ -1,11 +1,10 @@
 import abc
 from typing import Dict, List
+from langchain.prompts import BasePromptTemplate
 
 
-class BaseLLMModel(abc.ABCMeta):
-    def create_prompt(
-        self, files_structure: List[str], files_contents: Dict[str, str]
-    ) -> str:
+class BaseLLMModel(abc.ABC):
+    def get_prompt(self) -> BasePromptTemplate:
         pass
 
     def generate_readme(
