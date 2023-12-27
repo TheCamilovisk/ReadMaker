@@ -1,4 +1,6 @@
-from typing import Dict, List
+from typing import Any, Dict, List
+
+from langchain.chains.base import Chain
 
 
 def get_files_structure_text(files_list: List[str]) -> str:
@@ -7,10 +9,14 @@ def get_files_structure_text(files_list: List[str]) -> str:
     return text
 
 
-def get_files_contents_text(files_contents: Dict[str, str]) -> str:
-    text = "Projects files contents:\n"
+def get_files_summaries_text(files_contents: Dict[str, str]) -> str:
+    text = "Projects files contents summaries:\n"
     text += "\n".join(
         f"\t- File: {file}\n\t- Contents:\n```\n{contents}\n```\n"
         for file, contents in files_contents.items()
     )
     return text
+
+
+def execute_prompt(chain: Chain, **kwrags: Any):
+    return chain.invoke(kwrags)
