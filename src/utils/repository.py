@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 from git import Repo
 
@@ -33,3 +34,12 @@ def get_repo(repo_url: str, repo_path: str) -> Repo:
 
 def get_repo_name_from_url(repo_url: str) -> str:
     return os.path.basename(repo_url)
+
+
+def get_repo_ignored(repo: Repo, files_list: List[str]) -> List[str]:
+    return repo.ignored(*files_list)
+
+
+def get_repo_non_ignored(repo: Repo, files_list: List[str]) -> List[str]:
+    ignored = get_repo_ignored(repo, files_list)
+    return [p for p in files_list if p not in ignored]
