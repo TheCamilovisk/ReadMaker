@@ -2,7 +2,7 @@ import os
 from typing import Dict, List
 
 from src.utils.files import get_file_contents, get_files_list, get_relative_path
-from src.utils.repository import get_repo, get_repo_name_from_url
+from src.utils.repository import get_repo, get_repo_name_from_url, get_repo_non_ignored
 
 from .baseadapter import BaseRepositoryAdapter
 
@@ -21,6 +21,7 @@ class DefaultRepositoryAdapter(BaseRepositoryAdapter):
 
     def repo_list(self, absolute: bool = False) -> List[str]:
         raw_files_list = get_files_list(self.repo_path, include_hidden=False)
+        raw_files_list[:] = get_repo_non_ignored(self.repo, raw_files_list)
         files_list = (
             raw_files_list
             if absolute
