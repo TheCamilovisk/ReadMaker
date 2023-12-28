@@ -9,14 +9,14 @@ def get_files_structure_text(files_list: List[str]) -> str:
     return text
 
 
-def get_files_summaries_text(files_contents: Dict[str, str]) -> str:
+def get_files_summaries_text(files_summaries: Dict[str, str]) -> str:
     text = "Projects files contents summaries:\n"
     text += "\n".join(
-        f"\t- File: {file}\n\t- Contents:\n```\n{contents}\n```\n"
-        for file, contents in files_contents.items()
+        f"\t- File: {file}\n\t- Contents: {summary}"
+        for file, summary in files_summaries.items()
     )
     return text
 
 
 def execute_prompt(chain: Chain, **kwrags: Any):
-    return chain.invoke(kwrags)
+    return chain.run(kwrags)
