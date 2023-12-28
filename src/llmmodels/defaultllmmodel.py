@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from langchain.llms.openai import OpenAI
+from langchain.chains.llm import LLMChain
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import BasePromptTemplate, PromptTemplate
 
 from src.utils.prompt import (
@@ -14,29 +15,40 @@ from .basellmmodel import BaseLLMModel
 
 class DefaultLLMModel(BaseLLMModel):
     def __init__(self):
-        self.llm = OpenAI()
+        self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-1106")
         self.file_summary_prompt = self._get_file_summary_prompt()
-        self.file_summary_chain = self.file_summary_prompt | self.llm
+        self.file_summary_chain = LLMChain(
+            llm=self.llm, prompt=self.file_summary_prompt
+        )
         self.readme_prompt = self._get_readme_prompt()
-        self.readme_chain = self.readme_prompt | self.llm
+        self.readme_chain = LLMChain(llm=self.llm, prompt=self.readme_prompt)
 
     def _get_file_summary_prompt(self) -> BasePromptTemplate:
-        prompt_template = PromptTemplate(
-            input_variables=["file", "file_content"],
-            template="Please provide a clear, concise, and objective summary of the following content from '{file}'. The summary should be in formal language, straightforward, and avoid complex vocabulary.\n\n Content to summarize:\n{file_content}",
-        )
-        return prompt_template
+        template = """Write a concise summary, with 3 lines at most, of the following file contents:
+        
+        {file_content}
+        
+        SUMMARY:"""
+        prompt = PromptTemplate.from_template(template)
+        return prompt
 
     def _get_readme_prompt(self) -> BasePromptTemplate:
+        template = """Generate a README.md for a repository with the following features:
+        
+        
+        {file_structure}
+        
+        
+        {files_contents}
+        
+        
+        The README.md should provide a clear and concise overview of the repository.
+        README.md TEXT:
+        """
+
         prompt_template = PromptTemplate(
             input_variables=["file_structure", "files_contents"],
-            template="Generate a README.md for a repository with the following features:\n"
-            + "\n"
-            + "{file_structure}"
-            + "\n\n"
-            + "{files_contents}"
-            + "\n"
-            + "The README.md should provide a clear and concise overview of the repository.",
+            template=template,
         )
         return prompt_template
 
@@ -44,9 +56,8 @@ class DefaultLLMModel(BaseLLMModel):
         files_summaries = {}
         for file, contents in files_contents.items():
             print(f"Summarizing file: {file}")
-            files_summaries[file] = execute_prompt(
-                self.file_summary_chain, file=file, file_content=contents
-            )
+            summary = self.file_summary_chain.run(contents)
+            files_summaries[file] = summary
         return files_summaries
 
     def generate_readme(
