@@ -1,9 +1,22 @@
 import ctypes
 import os
 import platform
-from typing import Dict, List
+from typing import List
 
 import magic
+from langchain.document_loaders import (
+    JSONLoader,
+    NotebookLoader,
+    PythonLoader,
+    TextLoader,
+)
+from langchain.document_loaders.base import BaseLoader
+
+_document_loaders = {
+    "py": PythonLoader,
+    "ipynb": NotebookLoader,
+    "json": JSONLoader,
+}
 
 
 def _is_hidden_unix(path: str) -> bool:
@@ -47,11 +60,13 @@ def get_files_list(root_dir: str, include_hidden: bool = False) -> List[str]:
     return files_paths_list
 
 
-def get_file_contents(file_path: str) -> Dict[str, str]:
+def get_file_contents(file_path: str) -> str:
     if not (os.path.isfile(file_path) and is_text_file(file_path)):
         raise ValueError(f"Not a valid text file: {file_path}")
-    with open(file_path, "r", encoding="utf-8") as file:
-        content = file.read()
+    ext = os.path.splitext(file_path)[-1].replace(".", "").lower()
+    LoaderClass: BaseLoader = _document_loaders.get(ext, TextLoader)
+    loader = LoaderClass(file_path)
+    content = loader.load()
     return content
 
 
