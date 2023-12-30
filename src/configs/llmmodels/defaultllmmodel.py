@@ -6,7 +6,7 @@ from src import config
 from src.utils.files import get_file_contents, get_files_list
 
 
-class DefaultLLModelConfig:
+class DefaultLLMModelConfig:
     def load_prompts_from_folder(self, folder_path: str) -> None:
         files_list = get_files_list(folder_path)
         files_contents = {}
@@ -24,7 +24,7 @@ class DefaultLLModelConfig:
         self.license_prompt_template = files_contents["license_text"]
 
     @classmethod
-    def get_default_config(cls) -> DefaultLLModelConfig:
+    def get_default_config(cls) -> DefaultLLMModelConfig:
         model_config = cls()
         resources_path = os.path.join(
             config.RESOURCES_DIR, "prompts", "defaultllmmodel"
