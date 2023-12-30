@@ -72,3 +72,8 @@ def get_file_contents(file_path: str) -> str:
 
 def get_relative_path(file_path: str, root_dir: str) -> str:
     return file_path.replace(root_dir, "")[1:]
+
+
+def load_text_file(file_path: str) -> str:
+    contents = "\n".join(d.page_content for d in get_file_contents(file_path))
+    return contents
