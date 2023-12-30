@@ -1,0 +1,17 @@
+We have a code repository with the following features:
+
+
+Project file structure:
+- TestRepo/file1.py
+- TestRepo/file2.py
+
+
+Projects files contents summaries:
+- File: TestRepo/file1.py
+- Contents: File 1 contents
+
+- File: TestRepo/file2.py
+- Contents: File 2 contents
+
+
+Write an Introduction text for the repository. The Introduction must provide a clear and concise overview of the repository, must have a single paragraph of 10 lines at most and should not mention files that are not related to the main goal of the repository (e.g.: README.md, LICENSE, requirements.txt, configuration files, etc). Add the title to the text. The output must be in markdown text.
