@@ -5,7 +5,6 @@ from langchain.prompts import BaseChatPromptTemplate, ChatPromptTemplate
 from langchain.schema import StrOutputParser
 
 from src.configs.llmmodels.defaultllmmodel import DefaultLLMModelConfig
-from src.utils.files import load_text_file
 from src.utils.preprocess import remove_markdown_tags
 from src.utils.prompt import (
     execute_prompt,

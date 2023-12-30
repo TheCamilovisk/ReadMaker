@@ -6,8 +6,6 @@ from langchain.llms.fake import FakeListLLM
 from src.llmmodels.defaultllmmodel import DefaultLLMModel
 from src.tests.utils import get_resource_path, get_text_resource
 from src.utils.prompt import get_files_structure_text, get_files_summaries_text
-from src.configs.llmmodels.defaultllmmodel import DefaultLLMModelConfig
-from src import config
 
 
 class TestDefaultLLMModel(unittest.TestCase):
