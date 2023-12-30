@@ -1,0 +1,10 @@
+We have a code repository with the following files:
+
+
+{files_structure}
+
+
+{files_summaries}
+
+
+Write the section "Repository overview" for the README. The section must consist of a title (top level) followed by a brief summary and purpose of each folder and the main. The output must be a markdown text and should not mention files that are not related to the main goal of the repository (e.g.: README.md, LICENSE, requirements.txt, configuration files, etc). Add the title (top level) to the text.

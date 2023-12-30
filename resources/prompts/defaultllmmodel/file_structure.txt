@@ -1,0 +1,5 @@
+We have a code repository with the following file structure:
+
+{files_structure}
+
+Write the text for the File Structure of the repository's README. The new file structure must be in a structured format, similar to output of the "tree" linux prompt command. The section text must consist of a title followed by the file structure. The output must be in markdown text.

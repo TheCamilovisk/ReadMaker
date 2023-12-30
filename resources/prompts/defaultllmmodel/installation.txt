@@ -1,0 +1,5 @@
+We have a code repository with the following file structure:
+
+{files_summaries}
+
+Write the text for the Installation section of this repository's README. The Installation section must contain (as subsections) the list of prerequisites, the list of the main used packages,  and environment setup instructions. Add the title (top level) to the text. The output must be a markdown text.

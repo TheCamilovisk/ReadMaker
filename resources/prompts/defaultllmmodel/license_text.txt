@@ -1,0 +1,5 @@
+We have a code repository with the following file structure:
+
+{files_structure}
+
+Write the section LICENSE of the repository. The text must consist of a title (top-level) followed by a single line, with the link to the repository's LICENSE file. The link should be relative to the root of the repository. The text of the link must be just the letters that represents the lincese type. The output must be a markdown text.

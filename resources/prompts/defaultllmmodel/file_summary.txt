@@ -1,0 +1,5 @@
+Write a concise summary, with 3 lines at most, of the following file contents:
+
+{file_contents}
+
+SUMMARY:
