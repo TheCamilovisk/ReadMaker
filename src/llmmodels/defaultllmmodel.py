@@ -4,6 +4,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import BaseChatPromptTemplate, ChatPromptTemplate
 from langchain.schema import StrOutputParser
 
+from src.configs.llmmodels.defaultllmmodel import DefaultLLMModelConfig
+from src.utils.files import load_text_file
 from src.utils.preprocess import remove_markdown_tags
 from src.utils.prompt import (
     execute_prompt,
@@ -15,7 +17,10 @@ from .basellmmodel import BaseLLMModel
 
 
 class DefaultLLMModel(BaseLLMModel):
-    def __init__(self):
+    def __init__(
+        self, config: DefaultLLMModelConfig = DefaultLLMModelConfig.get_default_config()
+    ):
+        self.config = config
         self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-1106")
         self.file_summary_chain = (
             self._get_file_summary_prompt() | self.llm | StrOutputParser()
@@ -34,63 +39,27 @@ class DefaultLLMModel(BaseLLMModel):
         )
         self.license_chain = self._get_license_prompt() | self.llm | StrOutputParser()
 
+    def _create_prompt(self, template_file_path: str) -> BaseChatPromptTemplate:
+        prompt = ChatPromptTemplate.from_template(template_file_path)
+        return prompt
+
     def _get_file_summary_prompt(self) -> BaseChatPromptTemplate:
-        template = """Write a concise summary, with 3 lines at most, of the following file contents:
-        
-        {file_contents}
-        
-        SUMMARY:"""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.file_summary_prompt_template)
 
     def _get_introduction_prompt(self) -> BaseChatPromptTemplate:
-        template = """We have a code repository with the following features:
-        
-        
-        {files_structure}
-        
-        
-        {files_summaries}
-        
-        
-        Write an Introduction text for the repository. The Introduction must provide a clear and concise overview of the repository, must have a single paragraph of 10 lines at most and should not mention files that are not related to the main goal of the repository (e.g.: README.md, LICENSE, requirements.txt, configuration files, etc). Add the title to the text. The output must be in markdown text."""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.introduction_prompt_template)
 
     def _get_file_structure_prompt(self) -> BaseChatPromptTemplate:
-        template = """We have a code repository with the following file structure:
-    
-        {files_structure}
-        
-        Write the text for the File Structure of the repository's README. The new file structure must be in a structured format, similar to output of the "tree" linux prompt command. The section text must consist of a title followed by the file structure. The output must be in markdown text."""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.file_structure_prompt_template)
 
     def _get_installation_prompt(self) -> BaseChatPromptTemplate:
-        template = """We have a code repository with the following file structure:
-
-        {files_summaries}
-
-        Write the text for the Installation section of this repository's README. The Installation section must contain (as subsections) the list of prerequisites, the list of the main used packages,  and environment setup instructions. Add the title (top level) to the text. The output must be a markdown text."""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.installation_prompt_template)
 
     def _get_repository_overview_prompt(self) -> BaseChatPromptTemplate:
-        template = """We have a code repository with the following files:
-        
-        
-        {files_structure}
-        
-        
-        {files_summaries}
-        
-        
-        Write the section "Repository overview" for the README. The section must consist of a title (top level) followed by a brief summary and purpose of each folder and the main. The output must be a markdown text and should not mention files that are not related to the main goal of the repository (e.g.: README.md, LICENSE, requirements.txt, configuration files, etc). Add the title (top level) to the text."""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.repository_overview_prompt_template)
 
     def _get_license_prompt(self) -> BaseChatPromptTemplate:
-        template = """We have a code repository with the following file structure:
-        
-        {files_structure}
-
-        Write the section LICENSE of the repository. The text must consist of a title (top-level) followed by a single line, with the link to the repository's LICENSE file. The link should be relative to the root of the repository. The text of the link must be just the letters that represents the lincese type. The output must be a markdown text."""
-        return ChatPromptTemplate.from_template(template)
+        return self._create_prompt(self.config.license_prompt_template)
 
     def _get_files_summaries(self, files_contents: Dict[str, str]) -> Dict[str, str]:
         files_summaries = {}
