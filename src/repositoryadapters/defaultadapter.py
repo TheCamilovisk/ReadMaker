@@ -1,8 +1,19 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
-from src.utils.files import get_file_contents, get_files_list, get_relative_path
-from src.utils.repository import get_repo, get_repo_name_from_url, get_repo_non_ignored
+from src.utils.files import (
+    get_file_contents,
+    get_files_list,
+    get_folder_structure_str,
+    get_relative_path,
+)
+from src.utils.repository import (
+    get_license_type_from_file,
+    get_repo,
+    get_repo_license_file,
+    get_repo_name_from_url,
+    get_repo_non_ignored,
+)
 
 from .baseadapter import BaseRepositoryAdapter
 
@@ -41,3 +52,28 @@ class DefaultRepositoryAdapter(BaseRepositoryAdapter):
             except Exception as e:
                 raise RuntimeError(f"Failed to get files contents.\nError:\n{e}")
         return contents_map
+
+    def repo_structure(
+        self,
+        directories_only: bool = True,
+        use_gitignore: bool = True,
+        exclude_patterns: Optional[List[str]] = ["__pycache__"],
+    ) -> str:
+        file_structure_lines = get_folder_structure_str(
+            self.repo_path,
+            directories_only=directories_only,
+            use_gitignore=use_gitignore,
+            exclude_patterns=exclude_patterns,
+        ).split("\n")
+        processed_tree_output = (
+            self.repo_name + "\n" + "\n".join(file_structure_lines[1:])
+        )
+        return processed_tree_output
+
+    def license(self) -> Tuple[str, str]:
+        license_path = get_repo_license_file(self.repo)
+        license_type = get_license_type_from_file(license_path)
+        license_link = license_path.replace(
+            self.repo_path, f"{self.repo_url}/blob/main"
+        )
+        return license_type, license_link
