@@ -5,6 +5,7 @@ from langchain.prompts import BaseChatPromptTemplate, ChatPromptTemplate
 from langchain.schema import StrOutputParser
 
 from src.configs.llmmodels.defaultllmmodel import DefaultLLMModelConfig
+from src.repositoryadapters.baseadapter import BaseRepositoryAdapter
 from src.utils.preprocess import remove_markdown_tags
 from src.utils.prompt import (
     execute_prompt,
@@ -17,9 +18,12 @@ from .basellmmodel import BaseLLMModel
 
 class DefaultLLMModel(BaseLLMModel):
     def __init__(
-        self, config: DefaultLLMModelConfig = DefaultLLMModelConfig.get_default_config()
+        self,
+        repo=BaseRepositoryAdapter,
+        config: DefaultLLMModelConfig = DefaultLLMModelConfig.get_default_config(),
     ):
         self.config = config
+        self.repo = repo
         self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-1106")
         self.file_summary_chain = (
             self._get_file_summary_prompt() | self.llm | StrOutputParser()
@@ -27,16 +31,12 @@ class DefaultLLMModel(BaseLLMModel):
         self.introduction_chain = (
             self._get_introduction_prompt() | self.llm | StrOutputParser()
         )
-        self.file_structure_chain = (
-            self._get_file_structure_prompt() | self.llm | StrOutputParser()
-        )
         self.installation_chain = (
             self._get_installation_prompt() | self.llm | StrOutputParser()
         )
         self.repository_overview_chain = (
             self._get_repository_overview_prompt() | self.llm | StrOutputParser()
         )
-        self.license_chain = self._get_license_prompt() | self.llm | StrOutputParser()
 
     def _create_prompt(self, template_file_path: str) -> BaseChatPromptTemplate:
         prompt = ChatPromptTemplate.from_template(template_file_path)
@@ -48,8 +48,12 @@ class DefaultLLMModel(BaseLLMModel):
     def _get_introduction_prompt(self) -> BaseChatPromptTemplate:
         return self._create_prompt(self.config.introduction_prompt_template)
 
-    def _get_file_structure_prompt(self) -> BaseChatPromptTemplate:
-        return self._create_prompt(self.config.file_structure_prompt_template)
+    def _get_file_structure_from_repo(self) -> str:
+        file_structure = self.repo.repo_structure(
+            directories_only=self.config.directories_only_in_file_structure
+        )
+        output_text = f"# File Structure\n\n```\n{file_structure}\n```"
+        return output_text
 
     def _get_installation_prompt(self) -> BaseChatPromptTemplate:
         return self._create_prompt(self.config.installation_prompt_template)
@@ -57,8 +61,10 @@ class DefaultLLMModel(BaseLLMModel):
     def _get_repository_overview_prompt(self) -> BaseChatPromptTemplate:
         return self._create_prompt(self.config.repository_overview_prompt_template)
 
-    def _get_license_prompt(self) -> BaseChatPromptTemplate:
-        return self._create_prompt(self.config.license_prompt_template)
+    def _get_license_from_repo(self) -> str:
+        license_type, license_link = self.repo.license()
+        output_text = f"# License\n\n[{license_type}]({license_link})"
+        return output_text
 
     def _get_files_summaries(self, files_contents: Dict[str, str]) -> Dict[str, str]:
         files_summaries = {}
@@ -85,9 +91,7 @@ class DefaultLLMModel(BaseLLMModel):
                     files_structure=files_structure_text,
                     files_summaries=files_summaries_text,
                 ),
-                execute_prompt(
-                    self.file_structure_chain, files_structure=files_structure_text
-                ),
+                self._get_file_structure_from_repo(),
                 execute_prompt(
                     self.installation_chain, files_summaries=files_summaries_text
                 ),
@@ -96,9 +100,7 @@ class DefaultLLMModel(BaseLLMModel):
                     files_structure=files_structure_text,
                     files_summaries=files_summaries_text,
                 ),
-                execute_prompt(
-                    self.license_chain, files_structure=files_structure_text
-                ),
+                self._get_license_from_repo(),
             )
         )
         return readme_text

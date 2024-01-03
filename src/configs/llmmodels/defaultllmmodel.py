@@ -18,10 +18,10 @@ class DefaultLLMModelConfig:
 
         self.file_summary_prompt_template = files_contents["file_summary"]
         self.introduction_prompt_template = files_contents["introduction"]
-        self.file_structure_prompt_template = files_contents["file_structure"]
         self.installation_prompt_template = files_contents["installation"]
         self.repository_overview_prompt_template = files_contents["repository_overview"]
-        self.license_prompt_template = files_contents["license_text"]
+
+        self.directories_only_in_file_structure = False
 
     @classmethod
     def get_default_config(cls) -> DefaultLLMModelConfig:
