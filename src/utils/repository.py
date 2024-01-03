@@ -1,5 +1,6 @@
 import os
-from typing import List
+from glob import glob
+from typing import List, Optional
 
 from git import Repo
 
@@ -43,3 +44,20 @@ def get_repo_ignored(repo: Repo, files_list: List[str]) -> List[str]:
 def get_repo_non_ignored(repo: Repo, files_list: List[str]) -> List[str]:
     ignored = get_repo_ignored(repo, files_list)
     return [p for p in files_list if p not in ignored]
+
+
+def get_repo_license_file(repo: Repo) -> Optional[str]:
+    path = repo.working_tree_dir
+    pattern = os.path.join(path, "*LICENSE")
+    glob_output = glob(pattern)
+    if glob_output:
+        return glob_output[0]
+    else:
+        return None
+
+
+def get_license_type_from_file(file_path: str) -> str:
+    license_type = None
+    with open(file_path, "r") as f:
+        license_type = f.readline().strip()
+    return license_type
