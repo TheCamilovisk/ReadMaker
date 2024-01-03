@@ -1,7 +1,7 @@
 import ctypes
 import os
 import platform
-from typing import List
+from typing import List, Optional
 
 import magic
 from langchain.document_loaders import (
@@ -77,3 +77,31 @@ def get_relative_path(file_path: str, root_dir: str) -> str:
 def load_text_file(file_path: str) -> str:
     contents = "\n".join(d.page_content for d in get_file_contents(file_path))
     return contents
+
+
+def get_folder_structure_str(
+    path: str,
+    directories_only: bool = False,
+    use_gitignore: bool = False,
+    exclude_patterns: Optional[List[str]] = None,
+) -> str:
+    if not (os.path.exists(path) and os.path.isdir(path)):
+        raise ValueError(f"Invalid path: {path}")
+
+    options = []
+
+    if directories_only:
+        options.append("-d")
+
+    if use_gitignore:
+        options.append("--gitignore")
+
+    if exclude_patterns is not None and exclude_patterns:
+        options.append("-I")
+        for pattern in exclude_patterns:
+            options.append(pattern)
+
+    cmd = "tree " + " ".join(options) + " " + path
+    tree_cmd_output = os.popen(cmd).read().strip()
+
+    return tree_cmd_output
