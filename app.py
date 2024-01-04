@@ -2,6 +2,9 @@ from typing import Any
 
 import streamlit as st
 
+from src.llmmodels.defaultllmmodel import BaseLLMModel, DefaultLLMModel
+from src.repositoryadapters.defaultadapter import DefaultRepositoryAdapter
+
 REQUIRED_STATE_VARS = (
     "readme_text",
     "readme_submited",
@@ -9,6 +12,8 @@ REQUIRED_STATE_VARS = (
     "repo_path",
     "has_readme",
     "info",
+    "repo_adapter",
+    "llm_model",
 )
 
 
@@ -18,12 +23,10 @@ def init_required_vars(force: bool = False) -> None:
             st.session_state[var] = None
 
 
-def generate_readme(repo_url: str, repo_path: str) -> str:
-    output = f"""This is a generated README text for the repository.
-
-INPUTS:
-- repo_url = {repo_url}
-- repo_path = {repo_path}"""
+def generate_readme(llm_model: BaseLLMModel) -> str:
+    output = llm_model.generate_readme(
+        llm_model.repo.repo_list(), llm_model.repo.repo_files_contents()
+    )
 
     return output
 
@@ -57,6 +60,12 @@ def main():
         if analyze_button and repo_url and repo_path:
             set_var("repo_url", repo_url)
             set_var("repo_path", repo_path)
+            repo_adapter = DefaultRepositoryAdapter(
+                repo_url=repo_url, base_dir=repo_path
+            )
+            llm_model = DefaultLLMModel(repo_adapter)
+            set_var("repo_adapter", repo_adapter)
+            set_var("llm_model", llm_model)
 
     if st.session_state.has_readme:
         st.subheader(":red[WARNING: The selected repository already contains a README]")
@@ -69,7 +78,7 @@ def main():
         st.button(
             "Generate README",
             on_click=set_var,
-            args=["readme_text", generate_readme(repo_url, repo_path)],
+            args=["readme_text", generate_readme(st.session_state.llm_model)],
         )
 
     elif st.session_state.readme_text:
