@@ -28,6 +28,8 @@ def generate_readme(llm_model: BaseLLMModel) -> str:
         llm_model.repo.repo_list(), llm_model.repo.repo_files_contents()
     )
 
+    set_var("readme_text", output)
+
     return output
 
 
@@ -77,8 +79,8 @@ def main():
     ):
         st.button(
             "Generate README",
-            on_click=set_var,
-            args=["readme_text", generate_readme(st.session_state.llm_model)],
+            on_click=generate_readme,
+            args=[st.session_state.llm_model],
         )
 
     elif st.session_state.readme_text:
