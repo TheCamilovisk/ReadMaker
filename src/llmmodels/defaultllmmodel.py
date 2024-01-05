@@ -91,7 +91,9 @@ class DefaultLLMModel(BaseLLMModel):
                 ),
                 self._get_file_structure_from_repo(),
                 execute_prompt(
-                    self.installation_chain, files_summaries=files_summaries_text
+                    self.installation_chain,
+                    files_summaries=files_summaries_text,
+                    repository_url=self.repo.repo_url,
                 ),
                 execute_prompt(
                     self.repository_overview_chain,
@@ -101,4 +103,5 @@ class DefaultLLMModel(BaseLLMModel):
                 self._get_license_from_repo(),
             )
         )
+        print("README.md generated")
         return readme_text
