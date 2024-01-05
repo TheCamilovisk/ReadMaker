@@ -24,9 +24,7 @@ def init_required_vars(force: bool = False) -> None:
 
 
 def generate_readme(llm_model: BaseLLMModel) -> str:
-    output = llm_model.generate_readme(
-        llm_model.repo.repo_list(), llm_model.repo.repo_files_contents()
-    )
+    output = llm_model.generate_readme()
 
     set_var("readme_text", output)
 
@@ -68,6 +66,7 @@ def main():
             llm_model = DefaultLLMModel(repo_adapter)
             set_var("repo_adapter", repo_adapter)
             set_var("llm_model", llm_model)
+            set_var("has_readme", bool(repo_adapter.readme()))
 
     if st.session_state.has_readme:
         st.subheader(":red[WARNING: The selected repository already contains a README]")
@@ -98,7 +97,7 @@ def main():
 
         submit_button = col2.button(
             "Submit README"
-            if not st.session_state.readme_submited
+            if not (st.session_state.has_readme and st.session_state.readme_submited)
             else "Update README",
             on_click=set_var,
             args=["readme_submited", True],
