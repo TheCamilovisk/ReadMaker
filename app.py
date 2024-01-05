@@ -35,6 +35,11 @@ def set_var(var_name: str, var_value: Any) -> None:
     st.session_state[var_name] = var_value
 
 
+def upload_readme():
+    st.session_state.repo_adapter.upload_readme(st.session_state.readme_text, force=True)
+    set_var("readme_submited", True)
+
+
 def main():
     st.set_page_config(page_title="ReadMaker: README Generator for Git Repositories")
 
@@ -99,8 +104,7 @@ def main():
             "Submit README"
             if not (st.session_state.has_readme and st.session_state.readme_submited)
             else "Update README",
-            on_click=set_var,
-            args=["readme_submited", True],
+            on_click=upload_readme,
             use_container_width=True,
         )
 
