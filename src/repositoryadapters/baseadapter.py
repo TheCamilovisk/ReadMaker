@@ -20,3 +20,6 @@ class BaseRepositoryAdapter(Protocol):
 
     def readme(self) -> Optional[str]:
         pass
+
+    def upload_readme(self, readme_text: str, force: bool = False) -> None:
+        pass

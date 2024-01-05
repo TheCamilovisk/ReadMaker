@@ -8,6 +8,8 @@ from src.utils.files import (
     get_relative_path,
 )
 from src.utils.repository import (
+    create_local_branch_commit_push,
+    create_random_branch_name,
     get_license_type_from_file,
     get_readme_file,
     get_repo,
@@ -81,3 +83,16 @@ class DefaultRepositoryAdapter(BaseRepositoryAdapter):
 
     def readme(self) -> Optional[str]:
         return get_readme_file(self.repo)
+
+    def upload_readme(self, readme_text: str, force: bool = False) -> None:
+        branch_name = create_random_branch_name(prefix="feature/crate-readme")
+        print("Uploading README.md file")
+        create_local_branch_commit_push(
+            self.repo,
+            branch_name,
+            "README.md",
+            readme_text,
+            "Generate README.md file",
+            force=True,
+        )
+        print("README.md UPLOADED")
