@@ -71,7 +71,7 @@ def get_file_contents(file_path: str) -> str:
 
 
 def get_relative_path(file_path: str, root_dir: str) -> str:
-    return file_path.replace(root_dir, "")[1:]
+    return file_path.replace(root_dir, "").removeprefix("/")
 
 
 def load_text_file(file_path: str) -> str:
@@ -105,3 +105,13 @@ def get_folder_structure_str(
     tree_cmd_output = os.popen(cmd).read().strip()
 
     return tree_cmd_output
+
+
+def create_local_file(file_path: str, file_content: str, force: bool = False) -> None:
+    if os.path.exists(file_path) and not force:
+        raise ValueError(
+            f"File {file_path} already exists. Set force to true to overwrite this behavior."
+        )
+
+    with open(file_path, "w") as f:
+        f.write(file_content)

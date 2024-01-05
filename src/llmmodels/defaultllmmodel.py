@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import BaseChatPromptTemplate, ChatPromptTemplate
@@ -19,7 +19,7 @@ from .basellmmodel import BaseLLMModel
 class DefaultLLMModel(BaseLLMModel):
     def __init__(
         self,
-        repo=BaseRepositoryAdapter,
+        repo: BaseRepositoryAdapter,
         config: DefaultLLMModelConfig = DefaultLLMModelConfig.get_default_config(),
     ):
         self.config = config
@@ -74,12 +74,10 @@ class DefaultLLMModel(BaseLLMModel):
             files_summaries[file] = summary
         return files_summaries
 
-    def generate_readme(
-        self, files_structure: List[str], files_contents: Dict[str, str]
-    ) -> str:
-        files_structure_text = get_files_structure_text(files_structure)
+    def generate_readme(self) -> str:
+        files_structure_text = get_files_structure_text(self.repo.repo_list())
 
-        files_summaries = self._get_files_summaries(files_contents)
+        files_summaries = self._get_files_summaries(self.repo.repo_files_contents())
         files_summaries_text = get_files_summaries_text(files_summaries)
 
         print("Generating README.md")
@@ -93,7 +91,9 @@ class DefaultLLMModel(BaseLLMModel):
                 ),
                 self._get_file_structure_from_repo(),
                 execute_prompt(
-                    self.installation_chain, files_summaries=files_summaries_text
+                    self.installation_chain,
+                    files_summaries=files_summaries_text,
+                    repository_url=self.repo.repo_url,
                 ),
                 execute_prompt(
                     self.repository_overview_chain,
@@ -103,4 +103,5 @@ class DefaultLLMModel(BaseLLMModel):
                 self._get_license_from_repo(),
             )
         )
+        print("README.md generated")
         return readme_text

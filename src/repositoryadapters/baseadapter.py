@@ -1,7 +1,9 @@
-from typing import Any, Dict, List, Protocol, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 
 class BaseRepositoryAdapter(Protocol):
+    repo_url: str
+
     def repo_list(self) -> List[str]:
         pass
 
@@ -14,4 +16,10 @@ class BaseRepositoryAdapter(Protocol):
         pass
 
     def license(self) -> Tuple[str, str]:
+        pass
+
+    def readme(self) -> Optional[str]:
+        pass
+
+    def upload_readme(self, readme_text: str, force: bool = False) -> None:
         pass
