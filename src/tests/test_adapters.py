@@ -89,6 +89,30 @@ class TestDefaultAdapter(unittest.TestCase):
 
         self.assertDictEqual(adapter.repo_files_contents(), expected_results)
 
+    @patch("src.repositoryadapters.defaultadapter.get_repo")
+    @patch("src.repositoryadapters.defaultadapter.get_readme_file")
+    def test_existing_readme(self, mock_get_readme_file, mock_get_repo):
+        mock_get_repo.return_value = "mocked repo"
+        mock_get_readme_file.return_value = "/home/workspace/TestRepo/README.md"
+
+        adapter = DefaultRepositoryAdapter(
+            "https://git-provider/owner/TestRepo", "/home/workspace"
+        )
+
+        self.assertTrue(adapter.readme())
+
+    @patch("src.repositoryadapters.defaultadapter.get_repo")
+    @patch("src.repositoryadapters.defaultadapter.get_readme_file")
+    def test_non_existing_readme(self, mock_get_readme_file, mock_get_repo):
+        mock_get_repo.return_value = "mocked repo"
+        mock_get_readme_file.return_value = None
+
+        adapter = DefaultRepositoryAdapter(
+            "https://git-provider/owner/TestRepo", "/home/workspace"
+        )
+
+        self.assertFalse(adapter.readme())
+
 
 if __name__ == "__main__":
     unittest.main()
