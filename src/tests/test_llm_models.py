@@ -1,12 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-from langchain.llms.fake import FakeListLLM
-
 from src.llmmodels.defaultllmmodel import DefaultLLMModel
+from src.repositoryadapters.defaultadapter import DefaultRepositoryAdapter
 from src.tests.utils import get_resource_path, get_text_resource
 from src.utils.prompt import get_files_structure_text, get_files_summaries_text
-from src.repositoryadapters.defaultadapter import DefaultRepositoryAdapter
 
 
 class TestDefaultLLMModel(unittest.TestCase):
@@ -21,20 +19,26 @@ class TestDefaultLLMModel(unittest.TestCase):
             "TestRepo/file2.py": "File 2 contents",
         }
 
-    @patch("src.llmmodels.defaultllmmodel.ChatOpenAI")
+    def mock_get_file_content(self, file: str) -> str:
+        return self.sample_files_contents.get(file, "")
+
     @patch("src.repositoryadapters.defaultadapter.get_repo")
     @patch("src.repositoryadapters.defaultadapter.get_files_list")
+    @patch("src.repositoryadapters.defaultadapter.get_file_contents")
     @patch("src.utils.repository.get_repo_ignored")
     def test_get_prompt(
-        self, mock_get_repo_ignored, mock_get_files_list, mock_get_repo, mock_openAi
+        self,
+        mock_get_repo_ignored,
+        mock_get_file_contents,
+        mock_get_files_list,
+        mock_get_repo,
     ):
         expected_prompt_path = get_resource_path("expected_prompt.txt")
         expected_prompt = get_text_resource(expected_prompt_path)
 
-        mock_openAi.result_value = FakeListLLM(responses=["foo", "bar"])
-
         mock_get_repo.return_value = "mocked repo"
         mock_get_files_list.return_value = self.sample_file_structure
+        mock_get_file_contents.side_effect = self.mock_get_file_content
         mock_get_repo_ignored.return_value = []
 
         file_structure_text = get_files_structure_text(self.sample_file_structure)
