@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Protocol, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 
 class BaseRepositoryAdapter(Protocol):
@@ -14,4 +14,7 @@ class BaseRepositoryAdapter(Protocol):
         pass
 
     def license(self) -> Tuple[str, str]:
+        pass
+
+    def readme(self) -> Optional[str]:
         pass
