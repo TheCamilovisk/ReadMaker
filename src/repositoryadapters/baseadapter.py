@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 
 class BaseRepositoryAdapter(Protocol):
+    repo_url: str
+
     def repo_list(self) -> List[str]:
         pass
 
