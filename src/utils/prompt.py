@@ -18,5 +18,6 @@ def get_files_summaries_text(files_summaries: Dict[str, str]) -> str:
     return text
 
 
-def execute_prompt(chain: Chain, **kwrags: Any):
-    return chain.invoke(kwrags)
+def execute_prompt(chain: Chain, **kwargs: Dict[str, Any]):
+    output = chain.invoke(kwargs)
+    return output

@@ -1,6 +1,6 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 
 class BaseLLMModel(Protocol):
-    def generate_readme(self, **kwargs: Any) -> str:
+    def generate_readme(self) -> str:
         pass

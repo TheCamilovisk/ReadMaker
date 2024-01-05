@@ -71,7 +71,7 @@ def get_file_contents(file_path: str) -> str:
 
 
 def get_relative_path(file_path: str, root_dir: str) -> str:
-    return file_path.replace(root_dir, "")[1:]
+    return file_path.replace(root_dir, "").removeprefix("/")
 
 
 def load_text_file(file_path: str) -> str:

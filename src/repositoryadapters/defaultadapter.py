@@ -9,6 +9,7 @@ from src.utils.files import (
 )
 from src.utils.repository import (
     get_license_type_from_file,
+    get_readme_file,
     get_repo,
     get_repo_license_file,
     get_repo_name_from_url,
@@ -77,3 +78,6 @@ class DefaultRepositoryAdapter(BaseRepositoryAdapter):
             self.repo_path, f"{self.repo_url}/blob/main"
         )
         return license_type, license_link
+
+    def readme(self) -> Optional[str]:
+        return get_readme_file(self.repo)
