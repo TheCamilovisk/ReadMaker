@@ -113,6 +113,16 @@ class TestDefaultAdapter(unittest.TestCase):
 
         self.assertFalse(adapter.readme())
 
+    @patch("src.repositoryadapters.defaultadapter.get_repo")
+    def test_accessible_repo_url(self, mock_get_repo):
+        mock_get_repo.return_value = "mocked repo"
+
+        adapter = DefaultRepositoryAdapter(
+            "https://git-provider/owner/TestRepo", "/home/workspace"
+        )
+
+        self.assertEqual(adapter.repo_url, "https://git-provider/owner/TestRepo")
+
 
 if __name__ == "__main__":
     unittest.main()
