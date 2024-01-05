@@ -1,5 +1,4 @@
 import os
-from glob import glob
 from typing import List, Optional
 
 from git import Repo
@@ -46,14 +45,21 @@ def get_repo_non_ignored(repo: Repo, files_list: List[str]) -> List[str]:
     return [p for p in files_list if p not in ignored]
 
 
-def get_repo_license_file(repo: Repo) -> Optional[str]:
-    path = repo.working_tree_dir
-    pattern = os.path.join(path, "*LICENSE")
-    glob_output = glob(pattern)
-    if glob_output:
-        return glob_output[0]
+def search_file_in_repo_root(repo: Repo, filename: str) -> Optional[str]:
+    path = repo._working_tree_dir
+    file_path = os.path.join(path, filename)
+    if os.path.isfile(file_path):
+        return file_path
     else:
         return None
+
+
+def get_repo_license_file(repo: Repo) -> Optional[str]:
+    return search_file_in_repo_root(repo, "LICENSE")
+
+
+def get_readme_file(repo: Repo) -> Optional[str]:
+    return search_file_in_repo_root(repo, "README.md")
 
 
 def get_license_type_from_file(file_path: str) -> str:
